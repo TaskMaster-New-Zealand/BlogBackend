@@ -147,6 +147,15 @@ REST_FRAMEWORK = {
 }
 
 # CORS settings
-CORS_ALLOWED_ORIGINS = DEBUG
+CORS_ALLOW_ALL_ORIGINS = DEBUG
+
+# CORS settings for production
 if not DEBUG:
-    CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
+    cors_origins = os.getenv('CORS_ALLOWED_ORIGINS', '')
+    
+    if cors_origins:
+        CORS_ALLOWED_ORIGINS = cors_origins.split(',')
+    else:
+        CORS_ALLOWED_ORIGINS = []
+else: 
+    CORS_ALLOWED_ORIGINS = []

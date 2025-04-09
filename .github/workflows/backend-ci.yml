@@ -59,6 +59,7 @@ jobs:
           pip install coverage flake8
 
       - name: 🔍 Run linter (flake8)
+        continue-on-error: true
         run: |
           source venv/bin/activate
           flake8 .

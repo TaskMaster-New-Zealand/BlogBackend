@@ -35,26 +35,36 @@ jobs:
       SECRET_KEY: dummy
 
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: 🐍 Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
+      - name: 🗃️ Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: 📦 Install dependencies
         run: |
           python -m venv venv
           source venv/bin/activate
           pip install -r requirements.txt
+          pip install coverage flake8
 
-      - name: Run migrations
+      - name: 🔍 Run linter (flake8)
         run: |
           source venv/bin/activate
-          python manage.py migrate
+          flake8 .
 
-      - name: Run tests
+      - name: 🧪 Run tests with coverage
         run: |
           source venv/bin/activate
-          python manage.py test
+          coverage run manage.py test
+          coverage report -m

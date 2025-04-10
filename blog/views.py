@@ -55,9 +55,6 @@ class LogoutView(generics.GenericAPIView):
         return Response(status=200)
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
-    """
-    Permiso personalizado que solo permite a los autores de un objeto editarlo.
-    """
     def has_object_permission(self, request, view, obj):
         # Los permisos de lectura se permiten para cualquier solicitud
         if request.method in permissions.SAFE_METHODS:
@@ -84,17 +81,14 @@ class PostViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Post.objects.all()
         
-        # Filtrar por estado
         status = self.request.query_params.get('status')
         if status:
             queryset = queryset.filter(status=status)
         
-        # Filtrar por categoría
         category = self.request.query_params.get('category')
         if category:
             queryset = queryset.filter(category__slug=category)
         
-        # Si no es staff, solo mostrar publicados
         if not self.request.user.is_staff:
             queryset = queryset.filter(status='published')
         

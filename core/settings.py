@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     
     #local apps
     'blog',
+    #token authentication
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -160,3 +162,13 @@ if not DEBUG:
     CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins.split(',') if origin.strip()]
 else:
     CORS_ALLOW_ALL_ORIGINS = True  
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # Require login
+    ],
+}

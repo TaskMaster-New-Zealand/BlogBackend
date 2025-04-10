@@ -8,3 +8,5 @@ router.register(r'posts', views.PostViewSet)
 
 urlpatterns = router.urls
 urlpatterns.append(path('register/', views.RegisterView.as_view(), name='register'))
+urlpatterns.append(path('login/', views.LoginView.as_view(), name='login'))
+urlpatterns.append(path('logout/', views.LogoutView.as_view(), name='logout'))

@@ -10,7 +10,9 @@ from .serializers import (CategorySerializer, PostListSerializer,
                          PostDetailSerializer, PostCreateUpdateSerializer, CommentSerializer, UserSerializer)
 from rest_framework import generics
 from django.contrib.auth.models import User
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -20,6 +22,37 @@ class RegisterView(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save()
 
+
+class LoginView(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        # Try to authenticate the user
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+
+        if not serializer.is_valid():
+            return Response(
+                {'error': 'Invalid credentials. Please try again.'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        # If valid, proceed with token generation
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+
+        return Response({
+            'token': token.key,
+            'user_id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+        })
+
+class LogoutView(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    def post(self, request):
+        request.user.auth_token.delete()
+        return Response(status=200)
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
     """

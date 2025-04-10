@@ -36,6 +36,7 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     published_at = models.DateTimeField(null=True, blank=True)
+    dislikes = models.ManyToManyField(User, related_name='disliked_posts', blank=True)
     
     class Meta:
         ordering = ['-created_at']
@@ -60,4 +61,5 @@ class Comment(models.Model):
         ordering = ['created_at']
     
     def __str__(self):
-        return f'Comment by {self.name} on {self.post}'# Create your models here.
+        return f'Comment by {self.name} on {self.post}'
+# Create your models here.

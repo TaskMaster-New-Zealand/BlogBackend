@@ -43,16 +43,27 @@ class PostDetailSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
     comments = serializers.SerializerMethodField()
+    dislike_count = serializers.SerializerMethodField()
+    user_has_disliked = serializers.SerializerMethodField()
     
     class Meta:
         model = Post
         fields = ['id', 'title', 'slug', 'content', 'author', 'category', 
-                  'status', 'created_at', 'updated_at', 'published_at', 'comments']
+                  'status', 'created_at', 'updated_at', 'published_at', 'comments', 'dislike_count', 'user_has_disliked']
         read_only_fields = ['slug']
     
     def get_comments(self, obj):
         comments = obj.comments.filter(approved=True)
         return CommentSerializer(comments, many=True).data
+
+    def get_dislike_count(self, obj):
+        return obj.dislikes.count()
+
+    def get_user_has_disliked(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.dislikes.filter(id=request.user.id).exists()
+        return False
 
 class PostCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:

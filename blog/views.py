@@ -123,3 +123,23 @@ class PostViewSet(viewsets.ModelViewSet):
             serializer.save(post=post)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'])
+    def toggle_dislike(self, request, slug=None):
+        post = self.get_object()
+        user = request.user
+        
+        if post.dislikes.filter(id=user.id).exists():
+            post.dislikes.remove(user)
+            return Response({
+                'status': 'success',
+                'message': 'Dislike removed',
+                'dislike_count': post.dislikes.count()
+            })
+        else:
+            post.dislikes.add(user)
+            return Response({
+                'status': 'success',
+                'message': 'Dislike added',
+                'dislike_count': post.dislikes.count()
+            })

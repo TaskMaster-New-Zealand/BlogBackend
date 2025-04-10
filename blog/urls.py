@@ -6,6 +6,5 @@ router = DefaultRouter()
 router.register(r'categories', views.CategoryViewSet)
 router.register(r'posts', views.PostViewSet)
 
-urlpatterns = [
-    path('', include(router.urls)),
-]
+urlpatterns = router.urls
+urlpatterns.append(path('register/', views.RegisterView.as_view(), name='register'))

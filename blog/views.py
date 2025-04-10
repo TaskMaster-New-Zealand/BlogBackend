@@ -7,7 +7,19 @@ from rest_framework.decorators import action
 from django.utils import timezone
 from .models import Category, Post, Comment
 from .serializers import (CategorySerializer, PostListSerializer, 
-                         PostDetailSerializer, PostCreateUpdateSerializer, CommentSerializer)
+                         PostDetailSerializer, PostCreateUpdateSerializer, CommentSerializer, UserSerializer)
+from rest_framework import generics
+from django.contrib.auth.models import User
+from rest_framework.permissions import AllowAny
+
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = (AllowAny,)
+    serializer_class = UserSerializer
+
+    def perform_create(self, serializer):
+        serializer.save()
+
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
     """

@@ -67,6 +67,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     comments = serializers.SerializerMethodField()
     like_count = serializers.SerializerMethodField()
+    user_has_liked = serializers.SerializerMethodField()
     dislike_count = serializers.SerializerMethodField()
     user_has_liked = serializers.SerializerMethodField()
     user_has_disliked = serializers.SerializerMethodField()
@@ -85,7 +86,14 @@ class PostDetailSerializer(serializers.ModelSerializer):
 
     def get_like_count(self, obj):
         return obj.likes.count()
-    
+
+    def get_user_has_liked(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.likes.filter(id=request.user.id).exists()
+        return False        
+
+
     def get_dislike_count(self, obj):
         return obj.dislikes.count()
 

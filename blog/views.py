@@ -143,3 +143,27 @@ class PostViewSet(viewsets.ModelViewSet):
                 'message': 'Dislike added',
                 'dislike_count': post.dislikes.count()
             })
+
+    @action(detail=True, methods=['post'])
+    def toggle_like(self, request, slug=None):
+        post = self.get_object()
+        user = request.user
+        
+        if post.likes.filter(id=user.id).exists():
+            post.likes.remove(user)
+            return Response({
+                'status': 'success',
+                'message': 'Like removed',
+                'like_count': post.likes.count()
+            })
+        else:
+            # Remove dislike if exists
+            if post.dislikes.filter(id=user.id).exists():
+                post.dislikes.remove(user)
+            post.likes.add(user)
+            return Response({
+                'status': 'success',
+                'message': 'Like added',
+                'like_count': post.likes.count(),
+                'dislike_count': post.dislikes.count()
+            })

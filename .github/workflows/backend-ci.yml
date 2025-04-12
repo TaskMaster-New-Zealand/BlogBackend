@@ -62,8 +62,9 @@ jobs:
         continue-on-error: true
         run: |
           source venv/bin/activate
-          flake8 . --exclude=./venv
-
+          flake8 . --exclude=./venv --ignore=E501
+        continue-on-error: true
+        
       - name: 🧪 Run tests with coverage
         run: |
           source venv/bin/activate

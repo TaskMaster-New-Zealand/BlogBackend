@@ -8,7 +8,7 @@ from .models import Category, Post
 
 class UserLoginTestCase(APITestCase):
     def setUp(self):
-         # Limpiar datos por si hay residuos de otros tests
+      
         Post.objects.all().delete()
         Category.objects.all().delete()
         User.objects.all().delete()

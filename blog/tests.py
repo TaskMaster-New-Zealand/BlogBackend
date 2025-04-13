@@ -39,7 +39,10 @@ class UserLoginTestCase(APITestCase):
 
 class PostTestCase(APITestCase):
     def setUp(self):
-        # Create user
+        Post.objects.all().delete()
+        Category.objects.all().delete()
+        User.objects.all().delete()
+        
         self.credentials = {
             'username': 'testuser',
             'password': 'testpassword',

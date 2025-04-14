@@ -172,11 +172,3 @@ REST_FRAMEWORK = {
 
 # CORS settings
 CORS_ORIGIN_ALLOW_ALL = True
-
-# Cache settings
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
-    }
-}

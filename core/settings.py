@@ -96,10 +96,6 @@ DATABASES = {
         'PASSWORD': os.getenv('DATABASE_PASSWORD', ''),
         'HOST': os.getenv('DATABASE_HOST', ''),
         'PORT': os.getenv('DATABASE_PORT', ''),
-        'CONN_MAX_AGE': 60,  # 1 minute connection persistence
-        'OPTIONS': {
-            'connect_timeout': 10,
-        },
     }
 }
 
@@ -152,31 +148,25 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Rest framework settings
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle'
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/day',
-        'user': '1000/day'
-    }
 }
 
 # CORS settings
 CORS_ORIGIN_ALLOW_ALL = True
 
-# Cache settings
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
-    }
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # Require login
+    ],
 }

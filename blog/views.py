@@ -4,6 +4,8 @@ from django.shortcuts import render
 from rest_framework import viewsets, permissions, filters, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.authentication import TokenAuthentication
+
 from django.utils import timezone
 from .models import Category, Post, Comment
 from .serializers import (CategorySerializer, PostListSerializer, 
@@ -73,7 +75,9 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
+    serializer_class = PostListSerializer
     permission_classes = [IsAuthorOrReadOnly]
+    authentication_classes = [TokenAuthentication]
     filter_backends = [filters.SearchFilter]
     search_fields = ['title', 'content']
     lookup_field = 'slug'

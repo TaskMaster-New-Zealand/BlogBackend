@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Category, Post, Comment
 from django.contrib.auth.models import User
+from django.utils.text import slugify
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -117,3 +118,18 @@ class PostCreateUpdateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['author'] = self.context['request'].user
         return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        new_title = validated_data.get('title', instance.title)
+
+        # Regenerar el slug solo si el título cambió
+        if new_title != instance.title:
+            base_slug = slugify(new_title)
+            slug = base_slug
+            counter = 1
+            while Post.objects.filter(slug=slug).exclude(pk=instance.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            instance.slug = slug
+
+        return super().update(instance, validated_data)

@@ -170,3 +170,10 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',  # Require login
     ],
 }
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}

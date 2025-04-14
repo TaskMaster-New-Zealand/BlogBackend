@@ -8,7 +8,7 @@ from rest_framework.authentication import TokenAuthentication
 
 from django.utils import timezone
 
-from blog.permissions import IsAuthenticatedForLikeDislike
+from blog.perm import IsAuthenticatedForLikeDislike
 from .models import Category, Post, Comment
 from .serializers import (CategorySerializer, PostListSerializer, 
                          PostDetailSerializer, PostCreateUpdateSerializer, CommentSerializer, UserSerializer)

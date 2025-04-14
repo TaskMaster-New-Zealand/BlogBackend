@@ -7,6 +7,8 @@ from rest_framework.decorators import action
 from rest_framework.authentication import TokenAuthentication
 
 from django.utils import timezone
+
+from blog.permissions import IsAuthenticatedForLikeDislike
 from .models import Category, Post, Comment
 from .serializers import (CategorySerializer, PostListSerializer, 
                          PostDetailSerializer, PostCreateUpdateSerializer, CommentSerializer, UserSerializer)
@@ -15,6 +17,7 @@ from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
+
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -76,7 +79,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostListSerializer
-    permission_classes = [IsAuthorOrReadOnly]
+    permission_classes = [IsAuthorOrReadOnly | IsAuthenticatedForLikeDislike]
     authentication_classes = [TokenAuthentication]
     filter_backends = [filters.SearchFilter]
     search_fields = ['title', 'content']

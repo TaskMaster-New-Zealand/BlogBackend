@@ -68,7 +68,6 @@ class PostDetailSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     comments = serializers.SerializerMethodField()
     like_count = serializers.SerializerMethodField()
-    user_has_liked = serializers.SerializerMethodField()
     dislike_count = serializers.SerializerMethodField()
     user_has_liked = serializers.SerializerMethodField()
     user_has_disliked = serializers.SerializerMethodField()

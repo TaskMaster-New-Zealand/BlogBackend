@@ -8,13 +8,13 @@ from rest_framework.authentication import TokenAuthentication
 
 from django.utils import timezone
 
-from blog.perm import IsAuthenticatedForLikeDislike
 from .models import Category, Post, Comment
 from .serializers import (CategorySerializer, PostListSerializer, 
                          PostDetailSerializer, PostCreateUpdateSerializer, CommentSerializer, UserSerializer)
 from rest_framework import generics
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from blog.perm import IsAuthorOrReadOnly, IsAuthenticatedForLikeDislike
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 

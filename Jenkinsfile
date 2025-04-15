@@ -95,7 +95,7 @@ pipeline {
         success{
             script{
                     current_stage = "Post Build"
-                    slackSend color: 'good', message: "[${env.JOB_NAME}][Rama : ${env.BRANCH_NAME}] [Stage :${current_stage}][Resultado: ${currentBuild.result}](<${env.BUILD_URL}|Detalle>)${build_duration_msg}", tokenCredentialId: 'slack-group3-token'
+                    slackSend color: 'good', message: "[${env.JOB_NAME}][Branch : ${env.GIT_BRANCH}] [Stage :${current_stage}][Resultado: ${currentBuild.result}](<${env.BUILD_URL}|Detail>)${build_duration_msg}", tokenCredentialId: 'slack-group3-token'
                 }
             }
     }

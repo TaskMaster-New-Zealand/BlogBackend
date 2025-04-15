@@ -121,6 +121,20 @@ pipeline {
                 }
             }
         }
+        stage('Clean images') {
+            steps {
+                script {
+                    start = System.currentTimeMillis()
+                    current_stage = env.STAGE_NAME
+                    sh """
+                        docker rmi -f taskmaster/backend:latest
+                        docker system prune -f
+                    """                    
+                    end = System.currentTimeMillis()
+                    build_duration_msg = build_duration_msg + "*" + current_stage + "*" + " : " + Util.getTimeSpanString(end - start) + "\n"
+                }
+            }
+        }
     }
 
     post {

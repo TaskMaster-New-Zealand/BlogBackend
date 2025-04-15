@@ -87,7 +87,9 @@ pipeline {
 
     post {
         always {
-            build_duration_msg = build_duration_msg + "\n *Total build time:* " +  "${currentBuild.durationString}".replaceAll(' and counting', "")
+            script{
+                build_duration_msg = build_duration_msg + "\n *Total build time:* " +  "${currentBuild.durationString}".replaceAll(' and counting', "")
+            }
             cleanWs()
         }
         success{

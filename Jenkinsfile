@@ -1,6 +1,8 @@
 import hudson.Util;
 def current_stage
 def build_duration_msg = "\n *Detail by Stage* \n"
+def dockerImage
+
 pipeline {
     agent any
 
@@ -9,6 +11,10 @@ pipeline {
         DEBUG = 'true'
         SECRET_KEY = 'dummy'
         PYTHON_VERSION = '3.12'
+        DOCKER_IMAGE = 'blog-backend'
+        AWS_REGION = 'us-east-1'
+        ECR_REPOSITORY = 'your-ecr-repo-name'
+        IMAGE_TAG = "${env.BUILD_NUMBER}"
     }
 
     stages {
@@ -80,6 +86,38 @@ pipeline {
                     }
                     end = System.currentTimeMillis()
                     build_duration_msg = build_duration_msg +  "*" + current_stage + "*" + " : "  + Util.getTimeSpanString(end - start) +"\n"
+                }
+            }
+        }
+        
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    start = System.currentTimeMillis()
+                    current_stage = env.STAGE_NAME
+                    // Build Docker image
+                    sh """
+                        docker build -t taskmaster/backend .
+                    """
+                    end = System.currentTimeMillis()
+                    build_duration_msg = build_duration_msg + "*" + current_stage + "*" + " : " + Util.getTimeSpanString(end - start) + "\n"
+                }
+            }
+        }
+
+        stage('Push to AWS ECR') {
+            steps {
+                script {
+                    start = System.currentTimeMillis()
+                    current_stage = env.STAGE_NAME
+                    sh """
+                        aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 016456419140.dkr.ecr.ap-southeast-2.amazonaws.com
+                        docker tag taskmaster/backend:latest 016456419140.dkr.ecr.ap-southeast-2.amazonaws.com/taskmaster/backend:latest
+                        docker push 016456419140.dkr.ecr.ap-southeast-2.amazonaws.com/taskmaster/backend:latest
+                    """                    
+                    end = System.currentTimeMillis()
+                    build_duration_msg = build_duration_msg + "*" + current_stage + "*" + " : " + Util.getTimeSpanString(end - start) + "\n"
                 }
             }
         }

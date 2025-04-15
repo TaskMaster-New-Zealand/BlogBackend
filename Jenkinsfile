@@ -31,7 +31,7 @@ pipeline {
             }
         }
 
-        stage('Linter Check') {
+        stage('Linter Check!') {
             steps {
                 script {
                     if (isUnix()) {

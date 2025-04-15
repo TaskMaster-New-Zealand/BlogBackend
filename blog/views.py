@@ -17,6 +17,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from blog.permissions import IsAuthenticatedForLikeDislike
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
+from rest_framework.views import APIView
 
 
 class RegisterView(generics.CreateAPIView):
@@ -178,3 +179,15 @@ class PostViewSet(viewsets.ModelViewSet):
             'like_count': post.likes.count(),
             'dislike_count': post.dislikes.count()
         })
+
+class DeleteAccountView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def delete(self, request):
+        user = request.user
+        serializer = UserSerializer(user)
+        serializer.delete(user)
+        return Response(
+            {"message": "Account successfully deleted"}, 
+            status=status.HTTP_204_NO_CONTENT
+        )

@@ -14,6 +14,13 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
+    def delete(self, instance):
+        # Check if user has posts before trying to delete them
+        if hasattr(instance, 'posts'):
+            instance.posts.all().delete()
+        instance.delete()
+        return instance
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category

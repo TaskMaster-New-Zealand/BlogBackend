@@ -30,7 +30,11 @@ class Post(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
     content = models.TextField()
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_posts')
+    author = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE,
+        related_name='posts'  # Add this line
+    )
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
     created_at = models.DateTimeField(auto_now_add=True)

@@ -1,6 +1,6 @@
 import hudson.Util;
 def current_stage
-def build_duration_msg = "\n *Detail by Stage* \n"
+def build_duration_msg = "\n *TaskMaster Frontend - Detail by Stage* \n"
 def dockerImage
 
 pipeline {

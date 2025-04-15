@@ -1,3 +1,6 @@
+import hudson.Util;
+def current_stage
+def build_duration_msg = "\n *Detail by Stage* \n"
 pipeline {
     agent any
 
@@ -12,6 +15,8 @@ pipeline {
         stage('Setup Python Virtual Environment') {
             steps {
                 script {
+                    start = System.currentTimeMillis()
+                    current_stage =env.STAGE_NAME
                     if (isUnix()) {
                         sh '''
                             python3 -m venv venv
@@ -27,6 +32,8 @@ pipeline {
                             pip install coverage flake8
                         '''
                     }
+                    end = System.currentTimeMillis()
+                    build_duration_msg = build_duration_msg +  "*" + current_stage + "*" + " : "  + Util.getTimeSpanString(end - start) +"\n"
                 }
             }
         }
@@ -34,6 +41,8 @@ pipeline {
         stage('Linter Check!') {
             steps {
                 script {
+                    start = System.currentTimeMillis()
+                    current_stage =env.STAGE_NAME 
                     if (isUnix()) {
                         sh '''
                             . venv/bin/activate
@@ -45,6 +54,8 @@ pipeline {
                             flake8 . --exclude=./venv --ignore=E501 || echo "Flake8 finished with warnings."
                         '''
                     }
+                    end = System.currentTimeMillis()
+                    build_duration_msg = build_duration_msg +  "*" + current_stage + "*" + " : "  + Util.getTimeSpanString(end - start) +"\n"
                 }
             }
         }
@@ -52,6 +63,8 @@ pipeline {
         stage('Run Tests with Coverage') {
             steps {
                 script {
+                    start = System.currentTimeMillis()
+                    current_stage =env.STAGE_NAME 
                     if (isUnix()) {
                         sh '''
                             . venv/bin/activate
@@ -65,6 +78,8 @@ pipeline {
                             coverage report -m
                         '''
                     }
+                    end = System.currentTimeMillis()
+                    build_duration_msg = build_duration_msg +  "*" + current_stage + "*" + " : "  + Util.getTimeSpanString(end - start) +"\n"
                 }
             }
         }
@@ -72,7 +87,14 @@ pipeline {
 
     post {
         always {
+            build_duration_msg = build_duration_msg + "\n *Total build time:* " +  "${currentBuild.durationString}".replaceAll(' and counting', "")
             cleanWs()
         }
+        success{
+            script{
+                    current_stage = "Post Build"
+                    slackSend color: 'good', message: "[${env.JOB_NAME}][Rama : ${env.BRANCH_NAME}] [Stage :${current_stage}][Resultado: ${currentBuild.result}](<${env.BUILD_URL}|Detalle>)${build_duration_msg}", tokenCredentialId: 'slack-group3-token'
+                }
+            }
     }
 }

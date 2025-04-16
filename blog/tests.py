@@ -97,6 +97,7 @@ class PostTestCase(APITestCase):
         )
         response = self.client.get(self.list_posts_url)
         
+        self.user.is_staff = True
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         print("Response data:", response.data)
         self.assertEqual(len(response.data), 1)
@@ -108,3 +109,47 @@ class PostTestCase(APITestCase):
         self.assertIn('dislike_count', response.data[0])
         self.assertIn('user_has_liked', response.data[0])
         self.assertIn('user_has_disliked', response.data[0])
+        
+    def test_delete_own_post(self):
+        """The user can delete his own post"""
+        # Crear post como el usuario actual
+        post = Post.objects.create(
+            title='Post to delete',
+            content='Content',
+            author=self.user,
+            category=self.category,
+            status='published',
+            slug='post-to-delete'
+        )
+        post.save()
+        print(f"Slug real del post creado: {post.slug}")
+        print("Post slug:", post.slug)
+        print("DELETE URL:", reverse('post-detail', kwargs={'slug': post.slug}))
+        print("Todos los posts:", Post.objects.all())
+        
+        delete_url = reverse('post-detail', kwargs={'slug': post.slug})
+        response = self.client.delete(delete_url)
+        
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Post.objects.filter(pk=post.pk).exists())
+
+    def test_user_cannot_delete_others_post(self):
+        """A user can't delete the don't post owned by him"""
+        other_user = User.objects.create_user(username='other', password='otherpass')
+        post = Post.objects.create(
+            title='Other user post',
+            content='No borrar',
+            author=other_user,
+            category=self.category,
+            status='published',
+            slug='other-user-post'
+        )
+        post.save()
+        print(f"Slug real del post creado: {post.slug}") 
+        
+        delete_url = reverse('post-detail', kwargs={'slug': post.slug})
+        response = self.client.delete(delete_url)
+        
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(Post.objects.filter(pk=post.pk).exists())
+

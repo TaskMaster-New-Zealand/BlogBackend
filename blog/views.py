@@ -80,7 +80,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostListSerializer
-    permission_classes = [IsAuthorOrReadOnly | IsAuthenticatedForLikeDislike]
+    permission_classes = [IsAuthorOrReadOnly | IsAuthenticatedForLikeDislike | permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication]
     filter_backends = [filters.SearchFilter]
     search_fields = ['title', 'content']
@@ -180,6 +180,15 @@ class PostViewSet(viewsets.ModelViewSet):
             'dislike_count': post.dislikes.count()
         })
 
+    def destroy(self, request, *args, **kwargs):
+        post = self.get_object()
+        if post.author != request.user:
+            return Response(
+                {"detail": "You do not have permission to delete this post."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        post.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 class DeleteAccountView(APIView):
     permission_classes = [IsAuthenticated]
     

@@ -153,3 +153,58 @@ class PostTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertTrue(Post.objects.filter(pk=post.pk).exists())
 
+    def test_view_post_detail(self):
+        post = Post.objects.create(
+            title='Post de prueba',
+            content='Contenido completo del post',
+            author=self.user,
+            category=self.category,
+            status='published',
+            slug='post-de-prueba'
+        )
+
+        url = reverse('post-detail', kwargs={'slug': post.slug})
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['title'], 'Post de prueba')
+        self.assertEqual(response.data['author']['username'], self.user.username)
+        
+    def test_user_can_view_own_posts(self):
+        # Create posts by the authenticated user
+        Post.objects.create(
+            title='My Post 1',
+            content='Content',
+            author=self.user,
+            category=self.category,
+            status='draft',
+            slug='my-post-1'
+        )
+        Post.objects.create(
+            title='My Post 2',
+            content='Content',
+            author=self.user,
+            category=self.category,
+            status='published',
+            slug='my-post-2'
+        )
+
+        # Create a post by another user
+        other = User.objects.create_user(username='other', password='123')
+        Post.objects.create(
+            title='Other user post',
+            content='Should not be visible',
+            author=other,
+            category=self.category,
+            status='published',
+            slug='other-post'
+        )
+
+        url = reverse('post-my-posts')
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        for post in response.data:
+            self.assertEqual(post['author']['username'], self.user.username)
+

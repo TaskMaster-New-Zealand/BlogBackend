@@ -180,6 +180,14 @@ class PostViewSet(viewsets.ModelViewSet):
             'dislike_count': post.dislikes.count()
         })
 
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def my_posts(self, request):
+        print("Checking user posts /my-posts/")
+        
+        queryset = Post.objects.filter(author=request.user)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
     def destroy(self, request, *args, **kwargs):
         post = self.get_object()
         if post.author != request.user:
